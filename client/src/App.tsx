@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { LoginForm } from './LoginForm'
 import reactLogo from './assets/react.svg'
 import './App.css'
 import React from 'react'
@@ -18,24 +19,24 @@ const callApi = async () => {
 function App() {
   const [count, setCount] = useState(0)
   const [apiResult, setApiResult] = useState<string | null>(null)
-
-  return (
-    <div className="App">
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <button onClick={callApi}>
-          Call API
-        </button>
-        { 
-          apiResult ? <div> { apiResult } </div> : null
-        }
-      </div>
-      <Link to={`other`}>Go to other route</Link>
-    </div>
-  )
+  return <LoginForm/>
+  // return (
+  //   <div className="App">
+  //     <h1>Vite + React</h1>
+  //     <div className="card">
+  //       <button onClick={() => setCount((count) => count + 1)}>
+  //         count is {count}
+  //       </button>
+  //       <button onClick={callApi}>
+  //         Call API
+  //       </button>
+  //       { 
+  //         apiResult ? <div> { apiResult } </div> : null
+  //       }
+  //     </div>
+  //     <Link to={`other`}>Go to other route</Link>
+  //   </div>
+  // )
 }
 
 export default App
