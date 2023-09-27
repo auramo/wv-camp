@@ -1,41 +1,46 @@
-import dotenv from "dotenv";
-dotenv.config();
-import express, { Express, Request, Response } from "express";
-import cors from "cors";
-import bodyParser from "body-parser";
-import { initAuth } from "./authenticator";
-import { initLogin } from "./loginHandler";
-import { initSession } from "./sessionInitializer";
-import runMigrations from "./migrationRunner";
+import dotenv from 'dotenv'
+dotenv.config()
+import express, { Express, Request, Response } from 'express'
+import path from 'path'
+import cors from 'cors'
+import bodyParser from 'body-parser'
+import { initSession } from './sessionInitializer'
+import runMigrations from './migrationRunner'
+import { getVentilationStatus } from './weconnect'
 
-const app: Express = express();
-const port = process.env.PORT || 8080;
+const app: Express = express()
+const port = process.env.PORT || 8080
 
-runMigrations();
+runMigrations()
 
 app.use(
   cors({
-    origin: "*",
+    origin: '*',
   })
-);
+)
 
-app.use(bodyParser.json({ limit: "5000kb" }));
-initSession(app);
-initAuth(app);
-initLogin(app);
+app.use(bodyParser.json({ limit: '5000kb' }))
+initSession(app)
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Express + TypeScript Server");
-});
+const clientAppHtml = (req: Request, res: Response) =>
+  res.sendFile(path.resolve(`${__dirname}/../../client/dist/index.html`))
+app.use('/login*', clientAppHtml)
+app.use('/assets/', express.static(`${__dirname}/../../client/dist/assets`))
+app.use('/', express.static(`${__dirname}/../../client/dist`))
 
-app.get("/behindlogin", (req: Request, res: Response) => {
-  res.send("Dummy page behind login");
-});
+app.get('/behindlogin', (req: Request, res: Response) => {
+  res.send('Dummy page behind login')
+})
 
-app.get("/api/hello", (req: Request, res: Response) => {
-  res.send('{"a": 1}');
-});
+app.get('/api/hello', (req: Request, res: Response) => {
+  res.send('{"a": 1}')
+})
+
+app.get('/api/getVentilationStatus', async (req: Request, res: Response) => {
+  const status = await getVentilationStatus('todo@todo.com', 'pass', 'vin')
+  res.send(JSON.stringify({ status }))
+})
 
 app.listen(port, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
-});
+  console.log(`⚡️[server]: Server is running at http://localhost:${port}`)
+})
