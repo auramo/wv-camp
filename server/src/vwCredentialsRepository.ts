@@ -33,5 +33,3 @@ export async function storeVwCredentials(
         ON CONFLICT (login) DO UPDATE SET login = ${login}, password = ${password}, vin = ${vin}`
   )
 }
-
-export default { findWvCredentialsByLogin: findVwCredentialsByLogin }
