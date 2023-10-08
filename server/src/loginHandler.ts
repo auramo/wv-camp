@@ -1,72 +1,61 @@
-import express, { Express, NextFunction, Request, Response } from "express";
+import express, { Express, NextFunction, Request, Response } from 'express'
+import { getVentilationStatus } from './weconnect'
+import { storeVwCredentials } from './vwCredentialsRepository'
 
-const noLoginRequiredPaths = [
-  /^\/public\//,
-  /^\/login.*/,
-  /^\/img\//,
-  /^\/css\//,
-  /^\/auth\/google.*/,
-  // TODO temporary:
-  /^\/api\/hello/,
-];
-
-// https://kentcdodds.com/blog/get-a-catch-block-error-message-with-typescript
-// maybe implement the util there:
-/*
-  function getErrorMessage(error: unknown) {
-    if (error instanceof Error) return error.message
-    return String(error)
-  }
-*/
+const loginRequiredPaths = [/^\/api\//]
 
 const errorResponse = (res: Response, err: any) => {
-  console.error(err);
-  res.status(500).json({ error: "Server error", err });
-};
+  console.error(err)
+  res.status(500).json({ error: 'Server error', err })
+}
 
 const loginCheck = (req: Request, res: Response, next: NextFunction) => {
-  console.info("loginCheck, is there a user?", req.user);
-  console.info(req.user);
-  if (!req.user) {
-    const acceptHeader = req.header("Accept");
-    if (acceptHeader && acceptHeader.indexOf("application/json") !== -1) {
-      res.status(401).json({ error: "Not logged in" });
-    } else {
-      const redirectSuffix = req.url === "/" ? "" : req.url;
-      res.redirect("/login" + redirectSuffix);
-    }
+  console.info('loginCheck, is there a user?', req.session.login)
+  console.info(req.session.login)
+  if (!req.session.login) {
+    res.status(401).json({ error: 'Not logged in' })
   } else {
-    next();
+    next()
   }
-};
-
-const loginPage = (req: Request, res: Response, next: NextFunction) =>
-  express.static(`${__dirname}/login.html`)(req, res, next);
+}
 
 export const initLogin = (app: Express) => {
   app.use((req: Request, res: Response, next: NextFunction) => {
     if (
-      noLoginRequiredPaths.some((allowedRegex) => req.path.match(allowedRegex))
+      loginRequiredPaths.some((requiredRegex) => req.path.match(requiredRegex))
     ) {
-      next();
+      loginCheck(req, res, next)
     } else {
-      loginCheck(req, res, next);
+      next()
     }
-  });
+  })
 
-  app.use("/login*", async (req, res, next) => {
+  app.get('/auth/logout', (req, res) => {
+    console.log('logout')
+    req.session.login = null
+    req.session.password = null
+    req.session.vin = null
+  })
+
+  app.post('/auth/login', async (req, res) => {
+    const { login, password, vin } = req.body
     try {
-      if (req.user) {
-        res.redirect("/");
-      } else {
-        loginPage(req, res, next);
-      }
-    } catch (err) {
-      errorResponse(res, err);
+      const ventilationStatus = await getVentilationStatus(login, password, vin)
+      await storeVwCredentials(login, password, vin)
+      req.session.login = login
+      res.status(200).json({ ventilationStatus })
+    } catch (e) {
+      console.error(getErrorMessage(e))
+      res.status(401).json({ message: `login failed ${getErrorMessage(e)}` })
     }
-  });
+  })
 
-  app.get("/logout", (req, res) => {
-    req.logOut((_) => res.redirect("/login"));
-  });
-};
+  app.post('/auth/loginStatus', async (req, res) => {
+    res.status(200).json({ loggedIn: !!req.session.login })
+  })
+}
+
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) return error.message
+  return String(error)
+}

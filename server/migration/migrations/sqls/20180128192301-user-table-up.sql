@@ -1,5 +1,6 @@
-CREATE TABLE user_account (
+CREATE TABLE vw_credentials (
   id BIGSERIAL PRIMARY KEY,
-  login text,
-  name text
+  login TEXT NOT NULL UNIQUE,
+  password TEXT NOT NULL,
+  vin TEXT NOT NULL
 );

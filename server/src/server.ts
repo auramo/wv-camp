@@ -5,6 +5,7 @@ import path from 'path'
 import cors from 'cors'
 import bodyParser from 'body-parser'
 import { initSession } from './sessionInitializer'
+import { initLogin } from './loginHandler'
 import runMigrations from './migrationRunner'
 import { getVentilationStatus } from './weconnect'
 
@@ -21,6 +22,7 @@ app.use(
 
 app.use(bodyParser.json({ limit: '5000kb' }))
 initSession(app)
+initLogin(app)
 
 const clientAppHtml = (req: Request, res: Response) =>
   res.sendFile(path.resolve(`${__dirname}/../../client/dist/index.html`))
