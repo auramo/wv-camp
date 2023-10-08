@@ -4,6 +4,7 @@ import { Transaction, execute, queryMaybeOne, sql } from 'possu'
 
 const WvCredentials = Record({
   login: String,
+  password: String,
   vin: String,
 })
 
@@ -14,7 +15,7 @@ export async function findVwCredentialsByLogin(
 ): Promise<User | null> {
   const user = await queryMaybeOne(
     pool,
-    sql`SELECT login, vin FROM wv_credentials WHERE LOWER(login) = ${login}`,
+    sql`SELECT login, password, vin FROM vw_credentials WHERE LOWER(login) = ${login}`,
     WvCredentials.check
   )
   console.info('Found user', user)

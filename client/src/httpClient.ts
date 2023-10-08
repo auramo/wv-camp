@@ -12,17 +12,14 @@ export async function post(url = '', data = {}) {
     referrerPolicy: 'no-referrer',
     body: JSON.stringify(data),
   })
-  return response.json() // parses JSON response into native JavaScript objects
+  return {
+    status: response.status,
+    body: await response.json(),
+  }
 }
 
-export async function get(path) {
+export async function get(path: string) {
   console.info('calling api..')
   const response = await fetch(path)
-  if (response.status == 200) {
-    return await response.json()
-  } else {
-    console.error(`Error when fetching ${path}, got status ${response.status}`)
-    const content = await response.text()
-    throw new Error(`Got ${response.status} \n ${content}`)
-  }
+  return await response.json()
 }

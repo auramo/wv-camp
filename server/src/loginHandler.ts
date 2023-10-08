@@ -13,7 +13,7 @@ const loginCheck = (req: Request, res: Response, next: NextFunction) => {
   console.info('loginCheck, is there a user?', req.session.login)
   console.info(req.session.login)
   if (!req.session.login) {
-    res.status(401).json({ error: 'Not logged in' })
+    res.status(401).json({ message: 'Not logged in' })
   } else {
     next()
   }

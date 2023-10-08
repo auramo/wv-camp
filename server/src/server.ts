@@ -8,6 +8,7 @@ import { initSession } from './sessionInitializer'
 import { initLogin } from './loginHandler'
 import runMigrations from './migrationRunner'
 import { getVentilationStatus } from './weconnect'
+import { findVwCredentialsByLogin } from './vwCredentialsRepository'
 
 const app: Express = express()
 const port = process.env.PORT || 8080
@@ -38,9 +39,23 @@ app.get('/api/hello', (req: Request, res: Response) => {
   res.send('{"a": 1}')
 })
 
-app.get('/api/getVentilationStatus', async (req: Request, res: Response) => {
-  const status = await getVentilationStatus('todo@todo.com', 'pass', 'vin')
-  res.send(JSON.stringify({ status }))
+app.get('/api/status', async (req: Request, res: Response) => {
+  const creds = await findVwCredentialsByLogin(req.session.login!)
+  if (!creds) {
+    // shouldn't happen at all, but let's handle the possible bug explicitly
+    res
+      .status(500)
+      .json({ error: `Could not find credentials with ${req.session.login}` })
+  } else {
+    const ventilationStatus = await getVentilationStatus(
+      creds.login,
+      creds.password,
+      creds.vin
+    )
+    res
+      .status(200)
+      .json({ ventilationStatus, login: creds.login, vin: creds.vin })
+  }
 })
 
 app.listen(port, () => {
