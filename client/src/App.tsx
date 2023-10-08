@@ -41,7 +41,25 @@ async function fetchStatus(setStatus: (status: Status) => void) {
 }
 
 function MainView(props: { status: LoggedInStatus }) {
-  return <div>main view. Vin: {props.status.vin}</div>
+  return (
+    <div>
+      <div style={{ padding: '10px' }}>{props.status.login}</div>
+      <div style={{ padding: '10px' }}>{props.status.vin}</div>
+      <div style={{ padding: '10px' }}>
+        Ventilation:{' '}
+        <span
+          style={{
+            background: '#519251',
+            color: '#fff',
+            padding: '5px',
+            borderRadius: '3px',
+          }}
+        >
+          {props.status.ventilationStatus}
+        </span>
+      </div>
+    </div>
+  )
 }
 
 function App() {
@@ -51,11 +69,11 @@ function App() {
   }, [])
   return (
     <div className="App">
+      <img src="/sporty-beetle2-small.png" />
+
       {status.loginState === 'loggedOut' ? (
         <Navigate to="/login" replace={true} />
       ) : null}
-      <h1>Vite + React</h1>
-      <Link to={`other`}>Go to other route</Link>
       {status.loginState === 'loggedIn' ? (
         <MainView status={status}></MainView>
       ) : null}
