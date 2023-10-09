@@ -5,6 +5,8 @@ import './App.css'
 import React from 'react'
 import { get, post } from './httpClient'
 
+const HOURS = 9
+
 interface UnknownStatus {
   loginState: 'unknown'
 }
@@ -58,6 +60,29 @@ function MainView(props: { status: LoggedInStatus }) {
           {props.status.ventilationStatus}
         </span>
       </div>
+      <form className="pure-form">
+        <fieldset>
+          <select
+            id="hours"
+            value={1}
+            style={{ marginRight: '5px' }}
+            onChange={(evt) => console.info('onchange')}
+          >
+            {[...Array(HOURS).keys()].map((hour) => (
+              <option key={hour}>{hour + 1 + ' '} hours</option>
+            ))}
+          </select>
+          <button
+            type="button"
+            className="pure-button pure-button-primary"
+            onClick={async () => {
+              console.info('starting ventilation')
+            }}
+          >
+            Schedule
+          </button>
+        </fieldset>
+      </form>
     </div>
   )
 }
