@@ -8,8 +8,11 @@ import { initSession } from './sessionInitializer'
 import { initLogin } from './loginHandler'
 import runMigrations from './migrationRunner'
 import { getVentilationStatus } from './weconnect'
-import { findVwCredentialsByLogin } from './vwCredentialsRepository'
-
+import {
+  findVwCredentialsByLogin,
+  storeVentilationSchedule,
+} from './CarRepository'
+import { startBackgroundJob } from './backgroundJob'
 const app: Express = express()
 const port = process.env.PORT || 8080
 
@@ -58,6 +61,13 @@ app.get('/api/status', async (req: Request, res: Response) => {
   }
 })
 
+app.post('/api/schedule', async (req: Request, res: Response) => {
+  await storeVentilationSchedule(req.session.login!, req.body.hours)
+  res.status(200).json({})
+})
+
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`)
 })
+
+startBackgroundJob()

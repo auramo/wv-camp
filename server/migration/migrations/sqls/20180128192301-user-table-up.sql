@@ -1,6 +1,0 @@
-CREATE TABLE vw_credentials (
-  id BIGSERIAL PRIMARY KEY,
-  login TEXT NOT NULL UNIQUE,
-  password TEXT NOT NULL,
-  vin TEXT NOT NULL
-);

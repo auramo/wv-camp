@@ -43,6 +43,7 @@ async function fetchStatus(setStatus: (status: Status) => void) {
 }
 
 function MainView(props: { status: LoggedInStatus }) {
+  const [hours, setHours] = useState(3)
   return (
     <div>
       <div style={{ padding: '10px' }}>{props.status.login}</div>
@@ -64,19 +65,25 @@ function MainView(props: { status: LoggedInStatus }) {
         <fieldset>
           <select
             id="hours"
-            value={1}
+            value={hours}
             style={{ marginRight: '5px' }}
-            onChange={(evt) => console.info('onchange')}
+            onChange={(evt) => setHours(Number(evt.target.value))}
           >
-            {[...Array(HOURS).keys()].map((hour) => (
-              <option key={hour}>{hour + 1 + ' '} hours</option>
-            ))}
+            {[...Array(HOURS).keys()].map((hourIndex) => {
+              const hour = hourIndex + 1
+              return (
+                <option key={hourIndex} value={hour}>
+                  {hour + ' '} hours
+                </option>
+              )
+            })}
           </select>
           <button
             type="button"
             className="pure-button pure-button-primary"
             onClick={async () => {
-              console.info('starting ventilation')
+              await post('/api/schedule', { hours })
+              console.info('schedule changed')
             }}
           >
             Schedule

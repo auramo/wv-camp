@@ -1,6 +1,6 @@
 import express, { Express, NextFunction, Request, Response } from 'express'
 import { getVentilationStatus } from './weconnect'
-import { storeVwCredentials } from './vwCredentialsRepository'
+import { storeVwCredentials } from './CarRepository'
 
 const loginRequiredPaths = [/^\/api\//]
 
