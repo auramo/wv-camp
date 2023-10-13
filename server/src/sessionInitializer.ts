@@ -15,7 +15,6 @@ const sessionOptions: SessionOptions = {
   cookie: { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: false },
   store: new PostgresqlStore({
     pool: pool,
-    tableName: 'user_sessions',
   }),
 }
 

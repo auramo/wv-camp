@@ -10,6 +10,7 @@ import runMigrations from './migrationRunner'
 import { getVentilationStatus } from './weconnect'
 import {
   findVwCredentialsByLogin,
+  getCarStatusInfo,
   storeVentilationSchedule,
 } from './CarRepository'
 import { startBackgroundJob } from './backgroundJob'
@@ -43,26 +44,19 @@ app.get('/api/hello', (req: Request, res: Response) => {
 })
 
 app.get('/api/status', async (req: Request, res: Response) => {
-  const creds = await findVwCredentialsByLogin(req.session.login!)
-  if (!creds) {
-    // shouldn't happen at all, but let's handle the possible bug explicitly
+  const carStatusInfo = await getCarStatusInfo(req.session.login!)
+  if (!carStatusInfo) {
     res
       .status(500)
       .json({ error: `Could not find credentials with ${req.session.login}` })
   } else {
-    const ventilationStatus = await getVentilationStatus(
-      creds.login,
-      creds.password,
-      creds.vin
-    )
-    res
-      .status(200)
-      .json({ ventilationStatus, login: creds.login, vin: creds.vin })
+    res.status(200).json(carStatusInfo)
   }
 })
 
 app.post('/api/schedule', async (req: Request, res: Response) => {
   await storeVentilationSchedule(req.session.login!, req.body.hours)
+  res.set('Cache-control', `no-store`)
   res.status(200).json({})
 })
 

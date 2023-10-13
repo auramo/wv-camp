@@ -1,26 +1,16 @@
 import { pool } from './Database'
-import { Record, Number, String, Static } from 'runtypes'
-import { Transaction, execute, queryMaybeOne, sql } from 'possu'
-
-const VwCredentials = Record({
-  login: String,
-  password: String,
-  vin: String,
-})
-
-type VwCredentials = Static<typeof VwCredentials>
+import { execute, queryMaybeOne, sql } from 'possu'
+import { CarStatusInfo, VwCredentials } from './carTypes'
 
 export async function findVwCredentialsByLogin(
   login: string
-): Promise<VwCredentials | null> {
+): Promise<VwCredentials | undefined> {
   const user = await queryMaybeOne(
     pool,
     sql`SELECT login, password, vin FROM car WHERE LOWER(login) = ${login}`,
     VwCredentials.check
   )
-  console.info('Found user', user)
-  if (user) return user
-  return null
+  return user
 }
 
 export async function storeVwCredentials(
@@ -45,3 +35,21 @@ export async function storeVentilationSchedule(
     WHERE LOWER(login) = ${login}`
   )
 }
+
+export async function getCarStatusInfo(
+  login: string
+): Promise<CarStatusInfo | undefined> {
+  const carStatusInfo = await queryMaybeOne(
+    pool,
+    sql`SELECT vin, 
+        ventilation_status AS "ventilationStatus",
+        last_status_call AS "ventilationStatusUpdated" ,
+        ventilate_until AS "schedulingEnds",
+        COALESCE(ventilate_until <= now(), FALSE) AS "scheduled"
+        FROM car WHERE LOWER(login) = ${login}`,
+    CarStatusInfo.check
+  )
+  return carStatusInfo
+}
+
+//select ventilate_until <= now() from car;
