@@ -17,9 +17,7 @@ interface LoggedOutStatus {
 
 interface LoggedInStatus {
   loginState: 'loggedIn'
-  vin: string
-  login: string
-  ventilationStatus: string
+  carStatusInfo: any
 }
 
 type Status = UnknownStatus | LoggedOutStatus | LoggedInStatus
@@ -28,7 +26,7 @@ async function fetchStatus(setStatus: (status: Status) => void) {
   const response = await fetch('/api/status')
   if (response.status === 200) {
     const responseContent = await response.json()
-    setStatus({ ...responseContent, loginState: 'loggedIn' })
+    setStatus({ carStatusInfo: responseContent, loginState: 'loggedIn' })
   } else if (response.status === 401) {
     setStatus({ loginState: 'loggedOut' })
   } else {
@@ -42,24 +40,44 @@ async function fetchStatus(setStatus: (status: Status) => void) {
   }
 }
 
+function getVentilationStatus(ventilationStatus: string): string {
+  switch (ventilationStatus) {
+    case null:
+      return 'UNKNOWN'
+    case 'ventilation':
+      return 'ON'
+    case 'off':
+      return 'OFF'
+    default:
+      return ventilationStatus
+  }
+}
+
 function MainView(props: { status: LoggedInStatus }) {
+  console.info(props.status)
   const [hours, setHours] = useState(3)
   return (
     <div>
-      <div style={{ padding: '10px' }}>{props.status.login}</div>
-      <div style={{ padding: '10px' }}>{props.status.vin}</div>
+      <div style={{ padding: '10px' }}>{props.status.carStatusInfo.vin}</div>
       <div style={{ padding: '10px' }}>
         Ventilation:{' '}
         <span
-          style={{
-            background: '#519251',
-            color: '#fff',
-            padding: '5px',
-            borderRadius: '3px',
-          }}
+          className={
+            props.status.carStatusInfo.ventilationStatus === 'ventilation'
+              ? 'stateIndicator--on'
+              : 'stateIndicator--off'
+          }
         >
-          {props.status.ventilationStatus}
+          {getVentilationStatus(props.status.carStatusInfo.ventilationStatus)}
         </span>
+      </div>
+      <div style={{ padding: '10px' }}>
+        Scheduled:{' '}
+        {props.status.carStatusInfo.scheduled ? (
+          <span className="stateIndicator--on">ON</span>
+        ) : (
+          <span className="stateIndicator--off">OFF</span>
+        )}
       </div>
       <form className="pure-form">
         <fieldset>
