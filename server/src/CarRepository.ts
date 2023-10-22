@@ -1,5 +1,5 @@
 import { pool } from './Database'
-import { execute, queryMaybeOne, sql } from 'possu'
+import { execute, queryMaybeOne, query, sql } from 'possu'
 import { CarStatusInfo, VwCredentials } from './carTypes'
 
 export async function findVwCredentialsByLogin(
@@ -50,6 +50,19 @@ export async function getCarStatusInfo(
     CarStatusInfo.check
   )
   return carStatusInfo
+}
+
+export async function getCarsToUpdate(): Promise<VwCredentials[]> {
+  const carsToUpdate = await query(
+    pool,
+    sql`SELECT vin, login, password 
+        FROM car 
+        WHERE COALESCE(last_status_call, '1970-01-01') <= NOW() - INTERVAL '5 minutes' 
+        AND COALESCE(last_start_cmd, '1970-01-01') <= NOW() - INTERVAL '5 minutes' 
+        AND ventilate_until >= NOW() + INTERVAL '5 minutes'`,
+    VwCredentials.check
+  )
+  return carsToUpdate
 }
 
 //select ventilate_until <= now() from car;
