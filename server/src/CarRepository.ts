@@ -36,6 +36,27 @@ export async function storeVentilationSchedule(
   )
 }
 
+export async function storeVentilationStarted(vin: string): Promise<void> {
+  await execute(
+    pool,
+    sql`UPDATE car SET last_start_cmd = now()
+        WHERE vin = ${vin}`
+  )
+}
+
+export async function storeLastStatusCall(
+  vin: string,
+  status: string
+): Promise<void> {
+  await execute(
+    pool,
+    sql`UPDATE car 
+        SET last_status_call = now(),
+            ventilation_status = ${status}
+        WHERE vin = ${vin}`
+  )
+}
+
 export async function getCarStatusInfo(
   login: string
 ): Promise<CarStatusInfo | undefined> {
