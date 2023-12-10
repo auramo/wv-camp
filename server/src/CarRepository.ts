@@ -1,6 +1,6 @@
 import { pool } from './Database'
 import { execute, queryMaybeOne, query, sql } from 'possu'
-import { CarStatusInfo, VwCredentials } from './carTypes'
+import { CarStatusInfo, VwCredentials, VentilationStatus } from './carTypes'
 
 export async function findVwCredentialsByLogin(
   login: string
@@ -57,6 +57,20 @@ export async function storeLastStatusCall(
   )
 }
 
+export async function getStoredVentilationStatus(
+  login: string
+): Promise<VentilationStatus | undefined> {
+  const carStatusInfo = await queryMaybeOne(
+    pool,
+    sql`SELECT
+        ventilation_status AS "ventilationStatus",
+        last_status_call AS "ventilationStatusUpdated" ,
+        FROM car WHERE LOWER(login) = ${login}`,
+    VentilationStatus.check
+  )
+  return carStatusInfo
+}
+
 export async function getCarStatusInfo(
   login: string
 ): Promise<CarStatusInfo | undefined> {
@@ -64,7 +78,7 @@ export async function getCarStatusInfo(
     pool,
     sql`SELECT vin, 
         ventilation_status AS "ventilationStatus",
-        last_status_call AS "ventilationStatusUpdated" ,
+        last_status_call AS "ventilationStatusUpdated",
         ventilate_until AS "schedulingEnds",
         COALESCE(ventilate_until <= now(), FALSE) AS "scheduled"
         FROM car WHERE LOWER(login) = ${login}`,

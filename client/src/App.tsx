@@ -42,14 +42,12 @@ async function fetchStatus(setStatus: (status: Status) => void) {
 
 function getVentilationStatus(ventilationStatus: string): string {
   switch (ventilationStatus) {
-    case null:
-      return 'UNKNOWN'
-    case 'ventilation':
+    case 'on':
       return 'ON'
     case 'off':
       return 'OFF'
     default:
-      return ventilationStatus
+      return 'UNKNOWN'
   }
 }
 
@@ -63,7 +61,7 @@ function MainView(props: { status: LoggedInStatus }) {
         Ventilation:{' '}
         <span
           className={
-            props.status.carStatusInfo.ventilationStatus === 'ventilation'
+            props.status.carStatusInfo.ventilationStatus === 'on'
               ? 'stateIndicator--on'
               : 'stateIndicator--off'
           }

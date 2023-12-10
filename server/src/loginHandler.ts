@@ -1,6 +1,6 @@
 import express, { Express, NextFunction, Request, Response } from 'express'
-import { getAirConditioningStatus } from './weconnect'
-import { storeVwCredentials } from './CarRepository'
+import { getAirConditioningStatus } from './statusChecker'
+import { storeLastStatusCall, storeVwCredentials } from './CarRepository'
 
 const loginRequiredPaths = [/^\/api\//]
 
@@ -41,11 +41,17 @@ export const initLogin = (app: Express) => {
     const { login, password, vin } = req.body
     try {
       const ventilationStatus = await getAirConditioningStatus(
-        login,
-        password,
-        vin
+        {
+          login,
+          password,
+          vin,
+        },
+        { storeCredentials: true, checkDbFirst: false }
       )
       await storeVwCredentials(login, password, vin)
+      if (ventilationStatus) {
+        await storeLastStatusCall(vin, ventilationStatus)
+      }
       req.session.login = login
       res.status(200).json({ ventilationStatus })
     } catch (e) {

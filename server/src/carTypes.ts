@@ -7,6 +7,8 @@ import {
   Boolean,
   InstanceOf,
   Null,
+  Union,
+  Literal,
 } from 'runtypes'
 
 export const VwCredentials = Record({
@@ -16,6 +18,13 @@ export const VwCredentials = Record({
 })
 
 export type VwCredentials = Static<typeof VwCredentials>
+
+export const VentilationStatus = Record({
+  ventilationStatusUpdated: InstanceOf(Date).Or(Null),
+  ventilationStatus: Union(Literal('on'), Literal('off')).Or(Null),
+})
+
+export type VentilationStatus = Static<typeof VentilationStatus>
 
 export const CarStatusInfo = Record({
   vin: String,
