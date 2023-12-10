@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 .env
+TODO.md
 
 server/client-dist/
 
