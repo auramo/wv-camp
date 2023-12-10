@@ -7,7 +7,7 @@ import bodyParser from 'body-parser'
 import { initSession } from './sessionInitializer'
 import { initLogin } from './loginHandler'
 import runMigrations from './migrationRunner'
-import { getVentilationStatus } from './weconnect'
+import { getAirConditioningStatus } from './weconnect'
 import {
   findVwCredentialsByLogin,
   getCarStatusInfo,

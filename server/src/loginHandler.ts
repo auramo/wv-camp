@@ -1,5 +1,5 @@
 import express, { Express, NextFunction, Request, Response } from 'express'
-import { getVentilationStatus } from './weconnect'
+import { getAirConditioningStatus } from './weconnect'
 import { storeVwCredentials } from './CarRepository'
 
 const loginRequiredPaths = [/^\/api\//]
@@ -40,7 +40,11 @@ export const initLogin = (app: Express) => {
   app.post('/auth/login', async (req, res) => {
     const { login, password, vin } = req.body
     try {
-      const ventilationStatus = await getVentilationStatus(login, password, vin)
+      const ventilationStatus = await getAirConditioningStatus(
+        login,
+        password,
+        vin
+      )
       await storeVwCredentials(login, password, vin)
       req.session.login = login
       res.status(200).json({ ventilationStatus })

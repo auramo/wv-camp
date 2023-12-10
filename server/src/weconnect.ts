@@ -1,40 +1,32 @@
 import util from 'node:util'
 import childProcess from 'node:child_process'
+import weconnectDummy from './weconnectDummyImplementation'
+import weconnectCli from './weconnectCliImplementation'
+import { AirConditioningStatus } from './weconnectTypes'
 
-const exec = util.promisify(childProcess.exec)
+const weConnect =
+  process.env.DUMMY_WECONNECT === 'true' ? weconnectDummy : weconnectCli
 
-const climatisationStatusCommand = (
+export async function getAirConditioningStatus(
   userName: string,
   password: string,
   VIN: string
-) =>
-  `weconnect-cli --no-cache --username "${userName}" --password "${password}" get /vehicles/${VIN}/domains/climatisation/climatisationStatus/climatisationState`
-
-const turnOnClimatisationCommand = (
-  userName: string,
-  password: string,
-  VIN: string
-) =>
-  `weconnect-cli --username "${userName}" --password "${password}" set /vehicles/${VIN}/controls/climatisation start`
-
-export async function getVentilationStatus(
-  userName: string,
-  password: string,
-  VIN: string
-) {
-  const { stdout } = await exec(
-    climatisationStatusCommand(userName, password, VIN)
-  )
-  return stdout.trim()
+): Promise<AirConditioningStatus> {
+  return await weConnect.getAirconditioningStatus({
+    login: userName,
+    password,
+    vin: VIN,
+  })
 }
 
-export async function startVentilation(
+export async function startAirConditioning(
   userName: string,
   password: string,
   VIN: string
-) {
-  const { stdout } = await exec(
-    turnOnClimatisationCommand(userName, password, VIN)
-  )
-  return stdout.trim()
+): Promise<void> {
+  await weConnect.startAirConditioning({
+    login: userName,
+    password,
+    vin: VIN,
+  })
 }

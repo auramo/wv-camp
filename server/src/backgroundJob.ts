@@ -4,7 +4,7 @@ import {
   storeVentilationStarted,
 } from './CarRepository'
 import { VwCredentials } from './carTypes'
-import { getVentilationStatus, startVentilation } from './weconnect'
+import { getAirConditioningStatus, startAirConditioning } from './weconnect'
 
 const INTERVAL_SECONDS = 5000
 
@@ -27,7 +27,7 @@ async function doIt() {
 }
 
 async function turnVentilationOnIfNecessary(carCreds: VwCredentials) {
-  const ventilationStatus = await getVentilationStatus(
+  const ventilationStatus = await getAirConditioningStatus(
     carCreds.login,
     carCreds.password,
     carCreds.vin
@@ -35,10 +35,12 @@ async function turnVentilationOnIfNecessary(carCreds: VwCredentials) {
   console.info(
     `Ventilation status for car ${carCreds.vin}: ${ventilationStatus}`
   )
-  await storeLastStatusCall(carCreds.vin, ventilationStatus)
+  if (ventilationStatus) {
+    await storeLastStatusCall(carCreds.vin, ventilationStatus)
+  }
   if (ventilationStatus === 'off') {
     console.info(`Starting ventilation for ${carCreds.vin}`)
-    await startVentilation(carCreds.login, carCreds.password, carCreds.vin)
+    await startAirConditioning(carCreds.login, carCreds.password, carCreds.vin)
     await storeVentilationStarted(carCreds.vin)
     console.info(`Started ventilation for ${carCreds.vin}`)
   }
