@@ -1,6 +1,11 @@
 import { pool } from './Database'
 import { execute, queryMaybeOne, query, sql } from 'possu'
-import { CarStatusInfo, VwCredentials, VentilationStatus } from './carTypes'
+import {
+  CarStatusInfo,
+  VwCredentials,
+  VentilationStatus,
+  CarSchedulingStatus,
+} from './carTypes'
 
 export async function findVwCredentialsByLogin(
   login: string
@@ -64,11 +69,27 @@ export async function getStoredVentilationStatus(
     pool,
     sql`SELECT
         ventilation_status AS "ventilationStatus",
-        last_status_call AS "ventilationStatusUpdated" ,
+        last_status_call AS "ventilationStatusUpdated"
         FROM car WHERE LOWER(login) = ${login}`,
     VentilationStatus.check
   )
   return carStatusInfo
+}
+
+export async function getCarSchedulingStatus(
+  login: string
+): Promise<CarSchedulingStatus | undefined> {
+  const schedulingStatus = await queryMaybeOne(
+    pool,
+    // We'll throw the vin here 'for good measure' so we don't have to
+    // fetch it in a separate query
+    sql`SELECT vin, 
+        ventilate_until AS "schedulingEnds",
+        COALESCE(ventilate_until <= now(), FALSE) AS "scheduled"
+        FROM car WHERE LOWER(login) = ${login}`,
+    CarSchedulingStatus.check
+  )
+  return schedulingStatus
 }
 
 export async function getCarStatusInfo(

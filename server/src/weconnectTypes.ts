@@ -1,6 +1,6 @@
 import { VwCredentials } from './carTypes'
 
-export type AirConditioningStatus = 'on' | 'off' | undefined
+export type AirConditioningStatus = 'on' | 'off' | null
 
 export interface WeConnect {
   getAirconditioningStatus: (

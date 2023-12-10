@@ -3,8 +3,10 @@ import {
   storeLastStatusCall,
   storeVwCredentials,
   getStoredVentilationStatus,
+  getCarSchedulingStatus,
+  findVwCredentialsByLogin,
 } from './CarRepository'
-import { VwCredentials } from './carTypes'
+import { CarStatusInfo, VwCredentials } from './carTypes'
 import { AirConditioningStatus } from './weconnectTypes'
 
 const FRESH_STATUS_MS_LIMIT = 60_000
@@ -54,4 +56,20 @@ export async function getAirConditioningStatus(
     await storeLastStatusCall(credentials.vin, ventilationStatus)
   }
   return ventilationStatus
+}
+
+export async function getCarStatusInfo(
+  login: string
+): Promise<CarStatusInfo | undefined> {
+  const credentials = await findVwCredentialsByLogin(login)
+  if (!credentials) {
+    console.error(`Could not find credentials with login ${login}`)
+    return undefined
+  }
+  const airconditioningStatus = await getAirConditioningStatus(credentials)
+  const schedulingStatus = await getCarSchedulingStatus(login)
+  if (schedulingStatus) {
+    return { ventilationStatus: airconditioningStatus, ...schedulingStatus }
+  }
+  return undefined
 }

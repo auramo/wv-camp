@@ -7,12 +7,8 @@ import bodyParser from 'body-parser'
 import { initSession } from './sessionInitializer'
 import { initLogin } from './loginHandler'
 import runMigrations from './migrationRunner'
-import { getAirConditioningStatus } from './weconnect'
-import {
-  findVwCredentialsByLogin,
-  getCarStatusInfo,
-  storeVentilationSchedule,
-} from './CarRepository'
+import { storeVentilationSchedule } from './CarRepository'
+import { getCarStatusInfo } from './statusChecker'
 import { startBackgroundJob } from './backgroundJob'
 const app: Express = express()
 const port = process.env.PORT || 8080

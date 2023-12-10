@@ -39,7 +39,7 @@ async function getAirconditioningStatus(
       return 'off'
     default:
       console.error(`Got an erroneous response from weconnect ${result}`)
-      return undefined
+      return null
   }
 }
 

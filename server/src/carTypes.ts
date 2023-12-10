@@ -26,12 +26,19 @@ export const VentilationStatus = Record({
 
 export type VentilationStatus = Static<typeof VentilationStatus>
 
+export const CarSchedulingStatus = Record({
+  vin: String,
+  scheduled: Boolean,
+  schedulingEnds: InstanceOf(Date).Or(Null),
+})
+
+export type CarSchedulingStatus = Static<typeof CarSchedulingStatus>
+
 export const CarStatusInfo = Record({
   vin: String,
   scheduled: Boolean,
   schedulingEnds: InstanceOf(Date).Or(Null),
-  ventilationStatusUpdated: InstanceOf(Date).Or(Null),
-  ventilationStatus: String.Or(Null),
+  ventilationStatus: Union(Literal('on'), Literal('off')).Or(Null),
 })
 
 export type CarStatusInfo = Static<typeof CarStatusInfo>

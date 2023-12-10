@@ -23,7 +23,7 @@ async function getAirconditioningStatus(
   }
   const status = carStatuses.get(credentials.vin)
   console.info(`[DUMMY] Got status ${status} for ${credentials.vin}...`)
-  return status
+  return status || null
 }
 
 async function startAirConditioning(credentials: VwCredentials): Promise<void> {
