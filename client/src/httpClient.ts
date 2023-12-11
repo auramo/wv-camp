@@ -12,10 +12,7 @@ export async function post(url = '', data = {}) {
     referrerPolicy: 'no-referrer',
     body: JSON.stringify(data),
   })
-  return {
-    status: response.status,
-    body: await response.json(),
-  }
+  return response
 }
 
 export async function get(path: string) {

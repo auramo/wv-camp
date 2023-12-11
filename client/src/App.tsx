@@ -3,7 +3,7 @@ import { Link, Navigate } from 'react-router-dom'
 import reactLogo from './assets/react.svg'
 import './App.css'
 import React from 'react'
-import { get, post } from './httpClient'
+import { post } from './httpClient'
 
 const HOURS = 9
 
@@ -22,6 +22,16 @@ interface LoggedInStatus {
 
 type Status = UnknownStatus | LoggedOutStatus | LoggedInStatus
 
+async function handleErrorResponse(response: Response) {
+  const responseText = await response.text()
+  console.error(
+    'Error while fetching status',
+    response.status,
+    await response.text()
+  )
+  alert(`${response.status}: ${responseText}`)
+}
+
 async function fetchStatus(setStatus: (status: Status) => void) {
   const response = await fetch('/api/status')
   if (response.status === 200) {
@@ -30,13 +40,14 @@ async function fetchStatus(setStatus: (status: Status) => void) {
   } else if (response.status === 401) {
     setStatus({ loginState: 'loggedOut' })
   } else {
-    const responseText = await response.text()
-    console.error(
-      'Error while fetching status',
-      response.status,
-      await response.text()
-    )
-    alert(`${response.status}: ${responseText}`)
+    await handleErrorResponse(response)
+  }
+}
+
+async function storeSchedule(schedule: { hours: number }) {
+  const response = await post('/api/schedule', schedule)
+  if (response.status !== 200) {
+    await handleErrorResponse(response)
   }
 }
 
@@ -98,8 +109,7 @@ function MainView(props: { status: LoggedInStatus }) {
             type="button"
             className="pure-button pure-button-primary"
             onClick={async () => {
-              await post('/api/schedule', { hours })
-              console.info('schedule changed')
+              await storeSchedule({ hours })
             }}
           >
             Schedule
