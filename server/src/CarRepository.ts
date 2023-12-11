@@ -6,6 +6,7 @@ import {
   VentilationStatus,
   CarSchedulingStatus,
 } from './carTypes'
+import { AirConditioningStatus } from './weconnectTypes'
 
 export async function findVwCredentialsByLogin(
   login: string
@@ -51,7 +52,7 @@ export async function storeVentilationStarted(vin: string): Promise<void> {
 
 export async function storeLastStatusCall(
   vin: string,
-  status: string
+  status: AirConditioningStatus
 ): Promise<void> {
   await execute(
     pool,
@@ -85,7 +86,7 @@ export async function getCarSchedulingStatus(
     // fetch it in a separate query
     sql`SELECT vin, 
         ventilate_until AS "schedulingEnds",
-        COALESCE(ventilate_until <= now(), FALSE) AS "scheduled"
+        COALESCE(ventilate_until >= now(), FALSE) AS "scheduled"
         FROM car WHERE LOWER(login) = ${login}`,
     CarSchedulingStatus.check
   )
@@ -101,7 +102,7 @@ export async function getCarStatusInfo(
         ventilation_status AS "ventilationStatus",
         last_status_call AS "ventilationStatusUpdated",
         ventilate_until AS "schedulingEnds",
-        COALESCE(ventilate_until <= now(), FALSE) AS "scheduled"
+        COALESCE(ventilate_until >= now(), FALSE) AS "scheduled"
         FROM car WHERE LOWER(login) = ${login}`,
     CarStatusInfo.check
   )
