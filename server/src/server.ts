@@ -31,10 +31,6 @@ app.use('/login*', clientAppHtml)
 app.use('/assets/', express.static(`${__dirname}/../../client/dist/assets`))
 app.use('/', express.static(`${__dirname}/../../client/dist`))
 
-app.get('/behindlogin', (req: Request, res: Response) => {
-  res.send('Dummy page behind login')
-})
-
 app.get('/api/hello', (req: Request, res: Response) => {
   res.send('{"a": 1}')
 })
