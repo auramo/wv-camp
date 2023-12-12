@@ -1,48 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Link, Navigate } from 'react-router-dom'
-import reactLogo from './assets/react.svg'
+import { Navigate } from 'react-router-dom'
 import './App.css'
-import React from 'react'
-import { post } from './httpClient'
+import { handleErrorResponse, post } from './httpClient'
+import { LoggedInStatus, useStatus } from './status'
 
 const HOURS = 9
-
-interface UnknownStatus {
-  loginState: 'unknown'
-}
-
-interface LoggedOutStatus {
-  loginState: 'loggedOut'
-}
-
-interface LoggedInStatus {
-  loginState: 'loggedIn'
-  carStatusInfo: any
-}
-
-type Status = UnknownStatus | LoggedOutStatus | LoggedInStatus
-
-async function handleErrorResponse(response: Response) {
-  const responseText = await response.text()
-  console.error(
-    'Error while fetching status',
-    response.status,
-    await response.text()
-  )
-  alert(`${response.status}: ${responseText}`)
-}
-
-async function fetchStatus(setStatus: (status: Status) => void) {
-  const response = await fetch('/api/status')
-  if (response.status === 200) {
-    const responseContent = await response.json()
-    setStatus({ carStatusInfo: responseContent, loginState: 'loggedIn' })
-  } else if (response.status === 401) {
-    setStatus({ loginState: 'loggedOut' })
-  } else {
-    await handleErrorResponse(response)
-  }
-}
 
 async function storeSchedule(schedule: { hours: number }) {
   const response = await post('/api/schedule', schedule)
@@ -121,9 +83,9 @@ function MainView(props: { status: LoggedInStatus }) {
 }
 
 function App() {
-  const [status, setStatus] = useState<Status>({ loginState: 'unknown' })
+  const [status, fetchStatus] = useStatus()
   useEffect(() => {
-    fetchStatus(setStatus)
+    fetchStatus()
   }, [])
   return (
     <div className="App">

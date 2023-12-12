@@ -20,3 +20,13 @@ export async function get(path: string) {
   const response = await fetch(path)
   return await response.json()
 }
+
+export async function handleErrorResponse(response: Response) {
+  const responseText = await response.text()
+  console.error(
+    'Error while fetching status',
+    response.status,
+    await response.text()
+  )
+  alert(`${response.status}: ${responseText}`)
+}
