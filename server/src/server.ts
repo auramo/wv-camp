@@ -42,7 +42,7 @@ app.get('/api/status', async (req: Request, res: Response) => {
   }
 })
 
-app.post('/api/schedule', async (req: Request, res: Response) => {
+app.post('/api/startAirConditioning', async (req: Request, res: Response) => {
   await storeVentilationSchedule(req.session.login!, req.body.hours)
   res.set('Cache-control', `no-store`)
   res.status(200).json({})

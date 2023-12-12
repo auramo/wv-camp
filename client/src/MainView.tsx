@@ -4,8 +4,8 @@ import { useState } from 'react'
 
 const HOURS = 9
 
-async function storeSchedule(schedule: { hours: number }) {
-  const response = await post('/api/schedule', schedule)
+async function startAirConditioning(schedule: { hours: number }) {
+  const response = await post('/api/startAirConditioning', schedule)
   if (response.status !== 200) {
     await handleErrorResponse(response)
   }
@@ -71,11 +71,12 @@ export function MainView(props: {
           <button
             type="button"
             className="pure-button pure-button-primary"
+            title="Air conditioning or Heating, depends on temperature"
             onClick={async () => {
-              await storeSchedule({ hours })
+              await startAirConditioning({ hours })
             }}
           >
-            Schedule
+            Start Air Conditioning
           </button>
         </fieldset>
       </form>
