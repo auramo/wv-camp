@@ -7,9 +7,9 @@ import bodyParser from 'body-parser'
 import { initSession } from './sessionInitializer'
 import { initLogin } from './loginHandler'
 import runMigrations from './migrationRunner'
-import { storeVentilationSchedule } from './CarRepository'
 import { getCarStatusInfo } from './statusChecker'
 import { startBackgroundJob } from './backgroundJob'
+import { startAirConditioning } from './airConditioningStarter'
 const app: Express = express()
 const port = process.env.PORT || 8080
 
@@ -43,7 +43,7 @@ app.get('/api/status', async (req: Request, res: Response) => {
 })
 
 app.post('/api/startAirConditioning', async (req: Request, res: Response) => {
-  await storeVentilationSchedule(req.session.login!, req.body.hours)
+  await startAirConditioning(req.session.login!, req.body.hours)
   res.set('Cache-control', `no-store`)
   res.status(200).json({})
 })
