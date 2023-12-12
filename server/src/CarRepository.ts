@@ -42,6 +42,14 @@ export async function storeVentilationSchedule(
   )
 }
 
+export async function clearVentilationSchedule(login: string): Promise<void> {
+  await execute(
+    pool,
+    sql`UPDATE car SET ventilate_until = NULL
+    WHERE LOWER(login) = ${login}`
+  )
+}
+
 export async function storeVentilationStarted(vin: string): Promise<void> {
   await execute(
     pool,

@@ -1,4 +1,5 @@
 import {
+  clearVentilationSchedule,
   findVwCredentialsByLogin,
   storeVentilationSchedule,
   storeVentilationStarted,
@@ -35,4 +36,14 @@ export async function startAirConditioning(login: string, hours: number) {
   // with the background job
   await storeVentilationSchedule(login, hours)
   await storeVentilationStarted(credentials.vin)
+}
+
+export async function stopAirConditioning(login: string) {
+  const credentials = await findVwCredentialsByLogin(login)
+  if (!credentials) {
+    console.error(`Could not find credentials with login ${login}`)
+    return
+  }
+  console.info(`Clearing air conditioning schedule for ${credentials.vin}`)
+  await clearVentilationSchedule(login)
 }

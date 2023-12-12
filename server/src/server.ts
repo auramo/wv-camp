@@ -9,7 +9,10 @@ import { initLogin } from './loginHandler'
 import runMigrations from './migrationRunner'
 import { getCarStatusInfo } from './statusChecker'
 import { startBackgroundJob } from './backgroundJob'
-import { startAirConditioning } from './airConditioningStarter'
+import {
+  startAirConditioning,
+  stopAirConditioning,
+} from './airConditioningController'
 const app: Express = express()
 const port = process.env.PORT || 8080
 
@@ -44,6 +47,12 @@ app.get('/api/status', async (req: Request, res: Response) => {
 
 app.post('/api/startAirConditioning', async (req: Request, res: Response) => {
   await startAirConditioning(req.session.login!, req.body.hours)
+  res.set('Cache-control', `no-store`)
+  res.status(200).json({})
+})
+
+app.post('/api/stopAirConditioning', async (req: Request, res: Response) => {
+  await stopAirConditioning(req.session.login!)
   res.set('Cache-control', `no-store`)
   res.status(200).json({})
 })

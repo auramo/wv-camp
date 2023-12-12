@@ -1,5 +1,3 @@
-import util from 'node:util'
-import childProcess from 'node:child_process'
 import weconnectDummy from './weconnectDummyImplementation'
 import weconnectCli from './weconnectCliImplementation'
 import { AirConditioningStatus } from './weconnectTypes'
