@@ -4,11 +4,15 @@ import { useState } from 'react'
 
 const HOURS = 9
 
-async function startAirConditioning(schedule: { hours: number }) {
+async function startAirConditioning(
+  schedule: { hours: number },
+  fetchStatus: () => void
+) {
   const response = await post('/api/startAirConditioning', schedule)
   if (response.status !== 200) {
     await handleErrorResponse(response)
   }
+  fetchStatus()
 }
 
 function getVentilationStatus(ventilationStatus: string): string {
@@ -73,7 +77,7 @@ export function MainView(props: {
             className="pure-button pure-button-primary"
             title="Air conditioning or Heating, depends on temperature"
             onClick={async () => {
-              await startAirConditioning({ hours })
+              await startAirConditioning({ hours }, props.fetchStatus)
             }}
           >
             Start Air Conditioning
