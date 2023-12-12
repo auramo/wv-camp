@@ -31,10 +31,6 @@ app.use('/login*', clientAppHtml)
 app.use('/assets/', express.static(`${__dirname}/../../client/dist/assets`))
 app.use('/', express.static(`${__dirname}/../../client/dist`))
 
-app.get('/api/hello', (req: Request, res: Response) => {
-  res.send('{"a": 1}')
-})
-
 app.get('/api/status', async (req: Request, res: Response) => {
   const carStatusInfo = await getCarStatusInfo(req.session.login!)
   if (!carStatusInfo) {
