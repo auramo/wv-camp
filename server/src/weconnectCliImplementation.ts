@@ -19,6 +19,13 @@ const turnOnClimatisationCommand = (
 ) =>
   `weconnect-cli --username "${userName}" --password "${password}" set /vehicles/${VIN}/controls/climatisation start`
 
+const turnOffClimatisationCommand = (
+  userName: string,
+  password: string,
+  VIN: string
+) =>
+  `weconnect-cli --username "${userName}" --password "${password}" set /vehicles/${VIN}/controls/climatisation stop`
+
 async function getAirconditioningStatus(
   credentials: VwCredentials
 ): Promise<AirConditioningStatus> {
@@ -57,6 +64,24 @@ async function startAirConditioning(credentials: VwCredentials): Promise<void> {
   console.info(`Air conditioning start command sent`)
 }
 
-const weConnect: WeConnect = { getAirconditioningStatus, startAirConditioning }
+async function stopAirConditioning(credentials: VwCredentials): Promise<void> {
+  console.info(
+    `Sending air conditioning stop command for ${credentials.vin}...`
+  )
+  await exec(
+    turnOffClimatisationCommand(
+      credentials.login,
+      credentials.password,
+      credentials.vin
+    )
+  )
+  console.info(`Air conditioning start command sent`)
+}
+
+const weConnect: WeConnect = {
+  getAirconditioningStatus,
+  startAirConditioning,
+  stopAirConditioning,
+}
 
 export default weConnect

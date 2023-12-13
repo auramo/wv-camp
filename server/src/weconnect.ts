@@ -28,3 +28,15 @@ export async function startAirConditioning(
     vin: VIN,
   })
 }
+
+export async function stopAirConditioning(
+  userName: string,
+  password: string,
+  VIN: string
+): Promise<void> {
+  await weConnect.stopAirConditioning({
+    login: userName,
+    password,
+    vin: VIN,
+  })
+}

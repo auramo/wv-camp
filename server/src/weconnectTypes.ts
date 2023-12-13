@@ -8,4 +8,5 @@ export interface WeConnect {
   ) => Promise<AirConditioningStatus>
 
   startAirConditioning: (credentials: VwCredentials) => Promise<void>
+  stopAirConditioning: (credentials: VwCredentials) => Promise<void>
 }

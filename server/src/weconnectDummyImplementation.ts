@@ -35,6 +35,19 @@ async function startAirConditioning(credentials: VwCredentials): Promise<void> {
   console.info(`[DUMMY] Air conditioning start command sent`)
 }
 
-const weConnect: WeConnect = { getAirconditioningStatus, startAirConditioning }
+async function stopAirConditioning(credentials: VwCredentials): Promise<void> {
+  console.info(
+    `[DUMMY] Sending air conditioning stop command for ${credentials.vin}...`
+  )
+  await simulateDelay()
+  carStatuses.set(credentials.vin, 'off')
+  console.info(`[DUMMY] Air conditioning stop command sent`)
+}
+
+const weConnect: WeConnect = {
+  getAirconditioningStatus,
+  startAirConditioning,
+  stopAirConditioning,
+}
 
 export default weConnect

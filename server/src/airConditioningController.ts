@@ -5,7 +5,10 @@ import {
   storeVentilationStarted,
 } from './CarRepository'
 import { getAirConditioningStatus } from './statusChecker'
-import { startAirConditioning as weConnectStartAc } from './weconnect'
+import {
+  startAirConditioning as weConnectStartAc,
+  stopAirConditioning as weConnectStopAc,
+} from './weconnect'
 
 export async function startAirConditioning(login: string, hours: number) {
   const credentials = await findVwCredentialsByLogin(login)
@@ -46,4 +49,10 @@ export async function stopAirConditioning(login: string) {
   }
   console.info(`Clearing air conditioning schedule for ${credentials.vin}`)
   await clearVentilationSchedule(login)
+  console.info(`Stopping air conditioning for ${credentials.vin}`)
+  await weConnectStopAc(
+    credentials.login,
+    credentials.password,
+    credentials.vin
+  )
 }
