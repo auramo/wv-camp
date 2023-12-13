@@ -101,22 +101,6 @@ export async function getCarSchedulingStatus(
   return schedulingStatus
 }
 
-export async function getCarStatusInfo(
-  login: string
-): Promise<CarStatusInfo | undefined> {
-  const carStatusInfo = await queryMaybeOne(
-    pool,
-    sql`SELECT vin, 
-        ventilation_status AS "ventilationStatus",
-        last_status_call AS "ventilationStatusUpdated",
-        ventilate_until AS "schedulingEnds",
-        COALESCE(ventilate_until >= now(), FALSE) AS "scheduled"
-        FROM car WHERE LOWER(login) = ${login}`,
-    CarStatusInfo.check
-  )
-  return carStatusInfo
-}
-
 export async function getCarsToUpdate(): Promise<VwCredentials[]> {
   const carsToUpdate = await query(
     pool,
@@ -129,5 +113,3 @@ export async function getCarsToUpdate(): Promise<VwCredentials[]> {
   )
   return carsToUpdate
 }
-
-//select ventilate_until <= now() from car;
