@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom'
 import { useStatus } from './status'
 import { MainView } from './MainView'
 import './App.css'
+import { Spinner } from './Spinner'
 
 function App() {
   const [status, fetchStatus] = useStatus()
@@ -18,7 +19,11 @@ function App() {
       ) : null}
       {status.loginState === 'loggedIn' ? (
         <MainView status={status} fetchStatus={fetchStatus}></MainView>
-      ) : null}
+      ) : (
+        <div className="mainView-spinner">
+          <Spinner />
+        </div>
+      )}
     </div>
   )
 }
